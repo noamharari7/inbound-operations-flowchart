@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inbound Operations — Process Flow</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { 
+  font-family: 'Segoe UI', Calibri, Arial, sans-serif; 
+  background: #ffffff; 
+  font-size: 13px;
+  color: #212121;
+}
+
+.page {
+  width: 1500px;
+  padding: 36px 48px 56px;
+  background: #ffffff;
+}
+
+/* TITLE */
+.page-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1f5496;
+  margin-bottom: 8px;
+  letter-spacing: .2px;
+  padding-bottom: 10px;
+  border-bottom: 3px solid #2f75b6;
+}
+.page-sub {
+  font-size: 11px;
+  color: #666;
+  margin-bottom: 28px;
+}
+
+/* LEGEND */
+.legend {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 28px;
+  padding: 10px 16px;
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  flex-wrap: wrap;
+}
+.leg { display: flex; align-items: center; gap: 7px; font-size: 11px; color: #444; }
+.leg-box { width: 16px; height: 12px; border-radius: 2px; border: 1px solid rgba(0,0,0,.2); flex-shrink: 0; }
+
+/* FLOW CONTAINER */
+.flow { display: flex; flex-direction: column; gap: 0; }
+
+/* PHASE ROW */
+.phase-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 6px;
+}
+
+/* PHASE LABEL */
+.phase-label {
+  writing-mode: horizontal-tb;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #fff;
+  background: #44546a;
+  padding: 8px 12px;
+  border-radius: 2px;
+  width: 100px;
+  flex-shrink: 0;
+  text-align: center;
+  margin-right: 12px;
+  line-height: 1.5;
+}
+
+/* BOXES */
+.box {
+  border-radius: 3px;
+  padding: 11px 14px;
+  flex-shrink: 0;
+  border: 1.5px solid;
+  min-width: 160px;
+  max-width: 210px;
+}
+.box-title { font-size: 12px; font-weight: 700; margin-bottom: 4px; line-height: 1.3; }
+.box-sub   { font-size: 10px; line-height: 1.5; opacity: .85; }
+.box-tag   { display: inline-block; font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 2px; margin-top: 5px; }
+
+/* BOX COLORS */
+.b-blue   { background: #e3f2fd; border-color: #1565c0; }
+.b-blue   .box-title { color: #1565c0; }
+.b-blue   .box-sub   { color: #1a237e; }
+.b-blue   .box-tag   { background: #1565c0; color: #fff; }
+
+.b-green  { background: #e8f5e9; border-color: #2e7d32; }
+.b-green  .box-title { color: #1b5e20; }
+.b-green  .box-sub   { color: #2e7d32; }
+.b-green  .box-tag   { background: #2e7d32; color: #fff; }
+
+.b-navy   { background: #2f75b6; border-color: #1f5496; }
+.b-navy   .box-title { color: #ffffff; }
+.b-navy   .box-sub   { color: #90caf9; }
+.b-navy   .box-tag   { background: rgba(255,255,255,.2); color: #fff; }
+
+.b-red    { background: #ffebee; border-color: #c62828; }
+.b-red    .box-title { color: #b71c1c; }
+.b-red    .box-sub   { color: #c62828; }
+.b-red    .box-tag   { background: #c62828; color: #fff; }
+
+.b-amber  { background: #fff8e1; border-color: #e65100; }
+.b-amber  .box-title { color: #bf360c; }
+.b-amber  .box-sub   { color: #e65100; }
+.b-amber  .box-tag   { background: #e65100; color: #fff; }
+
+.b-grey   { background: #eceff1; border-color: #546e7a; }
+.b-grey   .box-title { color: #263238; }
+.b-grey   .box-sub   { color: #546e7a; }
+.b-grey   .box-tag   { background: #546e7a; color: #fff; }
+
+.b-teal   { background: #e0f2f1; border-color: #00695c; }
+.b-teal   .box-title { color: #00695c; }
+.b-teal   .box-sub   { color: #004d40; }
+.b-teal   .box-tag   { background: #00695c; color: #fff; }
+
+/* ARROWS */
+.arr-h { display: flex; align-items: center; padding: 0 5px; flex-shrink: 0; }
+.arr-h svg { display: block; }
+
+.arr-v { display: flex; justify-content: center; align-items: center; height: 20px; margin: 0 0 0 100px; }
+
+/* MULTI-ROW CONNECTOR */
+.connector-row { display: flex; align-items: flex-start; gap: 0; margin-bottom: 6px; }
+.spacer { width: 100px; flex-shrink: 0; }
+
+/* SUB BOXES (conditions/rules) */
+.sub-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 6px 0 6px 100px; }
+.sub-box { background: #fafafa; border: 1px solid #ddd; border-radius: 3px; padding: 7px 10px; min-width: 120px; max-width: 160px; }
+.sub-box-title { font-size: 12px; font-weight: 700; color: #243e7a; margin-bottom: 3px; }
+.sub-box-text  { font-size: 11px; color: #555; line-height: 1.5; }
+
+/* STATUS CHAIN */
+.status-chain { display: flex; align-items: center; gap: 0; margin: 6px 0 6px 100px; flex-wrap: wrap; }
+.status-pill { background: #dae3f3; border: 1px solid #b4c7e7; border-radius: 3px; padding: 6px 12px; font-size: 11px; font-weight: 700; color: #1f5496; white-space: nowrap; }
+.status-pill.closed { background: #e2efda; border-color: #70ad47; color: #375623; }
+.status-arr { font-size: 15px; color: #aaa; padding: 0 4px; }
+
+/* DIVIDER */
+.divider { border: none; border-top: 1px dashed #e0e0e0; margin: 14px 0; }
+
+/* SECTION TITLE */
+.section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #243e7a;
+  margin: 22px 0 10px;
+  padding-left: 12px;
+  border-left: 4px solid #2f75b6;
+}
+
+/* RULES TABLE */
+.rules-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 6px 0 6px 0; }
+.rule-card { background: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 3px; padding: 9px 11px; }
+.rule-card-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #2f75b6; margin-bottom: 6px; }
+.rule-item { display: flex; gap: 6px; font-size: 11px; color: #444; margin-bottom: 4px; line-height: 1.5; }
+.rule-dot { width: 4px; height: 4px; border-radius: 50%; background: #1565c0; flex-shrink: 0; margin-top: 4px; }
+
+/* SEV TABLE */
+.sev-table { border-collapse: collapse; font-size: 9px; margin: 6px 0 6px 100px; }
+.sev-table th { background: #dae3f3; padding: 7px 12px; text-align: left; font-weight: 700; color: #243e7a; border: 1px solid #b4c7e7; }
+.sev-table td { padding: 6px 12px; border: 1px solid #cfd8dc; color: #333; font-size: 11px; }
+.sev-badge { display: inline-block; font-size: 8px; font-weight: 700; padding: 1px 6px; border-radius: 2px; }
+.sc { background: #ffebee; color: #c62828; }
+.sa { background: #fff8e1; color: #e65100; }
+.sm { background: #e8f5e9; color: #2e7d32; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="page-title">Inbound Operations — Process Flow</div>
+<div class="page-sub">All steps, rules, and automations</div>
+
+<div class="legend">
+  <div class="leg"><div class="leg-box" style="background:#e3f2fd;border-color:#1565c0"></div> Data sheet</div>
+  <div class="leg"><div class="leg-box" style="background:#1a3a6e;border-color:#0d2550"></div> Manual action</div>
+  <div class="leg"><div class="leg-box" style="background:#e8f5e9;border-color:#2e7d32"></div> Auto — formula / code</div>
+  <div class="leg"><div class="leg-box" style="background:#ffebee;border-color:#c62828"></div> Alert / Critical</div>
+  <div class="leg"><div class="leg-box" style="background:#fff8e1;border-color:#e65100"></div> Warning / Attention</div>
+  <div class="leg"><div class="leg-box" style="background:#e0f2f1;border-color:#00695c"></div> Archive</div>
+  <div class="leg">
+    <svg width="30" height="10"><line x1="0" y1="5" x2="24" y2="5" stroke="#555" stroke-width="1.5"/><polygon points="20,2 28,5 20,8" fill="#555"/></svg>
+    Automatic flow
+  </div>
+  <div class="leg">
+    <svg width="30" height="10"><line x1="0" y1="5" x2="24" y2="5" stroke="#e65100" stroke-width="1.5" stroke-dasharray="4,2"/><polygon points="20,2 28,5 20,8" fill="#e65100"/></svg>
+    Manual trigger
+  </div>
+</div>
+
+<!-- WORKBOOK OVERVIEW -->
+<div class="section-title">Workbook Structure — 7 Sheets</div>
+<div style="display:flex;align-items:center;gap:0;margin-bottom:18px;flex-wrap:wrap">
+  <div class="box b-blue" style="min-width:110px;max-width:130px"><div class="box-title">1. Master Data</div><div class="box-sub">Suppliers + Products</div></div>
+  <div class="arr-h"><svg width="28" height="12"><line x1="0" y1="6" x2="22" y2="6" stroke="#555" stroke-width="1.5"/><polygon points="18,3 26,6 18,9" fill="#555"/></svg></div>
+  <div class="box b-blue" style="min-width:110px;max-width:130px"><div class="box-title">2. Purchase Orders</div><div class="box-sub">PO Planning</div></div>
+  <div class="arr-h"><svg width="28" height="12"><line x1="0" y1="6" x2="22" y2="6" stroke="#555" stroke-width="1.5"/><polygon points="18,3 26,6 18,9" fill="#555"/></svg></div>
+  <div class="box b-blue" style="min-width:110px;max-width:130px"><div class="box-title">3. Inbound Tracker</div><div class="box-sub">Live Shipment Tracking</div></div>
+  <div class="arr-h"><svg width="28" height="12"><line x1="0" y1="6" x2="22" y2="6" stroke="#555" stroke-width="1.5"/><polygon points="18,3 26,6 18,9" fill="#555"/></svg></div>
+  <div class="box b-blue" style="min-width:110px;max-width:130px"><div class="box-title">4. Updates Log</div><div class="box-sub">All Live Updates</div></div>
+  <div class="arr-h"><svg width="28" height="12"><line x1="0" y1="6" x2="22" y2="6" stroke="#555" stroke-width="1.5"/><polygon points="18,3 26,6 18,9" fill="#555"/></svg></div>
+  <div class="box b-blue" style="min-width:110px;max-width:130px"><div class="box-title">5. Inventory Planning</div><div class="box-sub">Stock + Reorder</div></div>
+  <div class="arr-h"><svg width="28" height="12"><line x1="0" y1="6" x2="22" y2="6" stroke="#555" stroke-width="1.5"/><polygon points="18,3 26,6 18,9" fill="#555"/></svg></div>
+  <div class="box b-teal" style="min-width:110px;max-width:130px"><div class="box-title">6. PO History</div><div class="box-sub">Closed Orders Archive</div></div>
+  <div class="arr-h"><svg width="28" height="12"><line x1="0" y1="6" x2="22" y2="6" stroke="#555" stroke-width="1.5"/><polygon points="18,3 26,6 18,9" fill="#555"/></svg></div>
+  <div class="box b-navy" style="min-width:110px;max-width:130px"><div class="box-title">7. Dashboard</div><div class="box-sub">AI-Powered View</div></div>
+</div>
+
+<hr class="divider">
+
+<!-- PHASE 1 -->
+<div class="section-title">Phase 1 — Master Data (one-time setup)</div>
+<div class="phase-row">
+  <div class="box b-navy" style="min-width:130px">
+    <div class="box-title">Enter supplier data</div>
+    <div class="box-sub">Name, region, currency, production weeks, transit weeks, lead time, unit cost</div>
+    <div class="box-tag">Manual — once</div>
+  </div>
+  <div class="arr-h"><svg width="28" height="12"><line x1="0" y1="6" x2="22" y2="6" stroke="#e65100" stroke-width="1.5" stroke-dasharray="4,2"/><polygon points="18,3 26,6 18,9" fill="#e65100"/></svg></div>
+  <div class="box b-navy" style="min-width:130px">
+    <div class="box-title">Enter product data</div>
+    <div class="box-sub">SKU, description, category, supplier, units per pallet, unit cost</div>
+    <div class="box-tag">Manual — once</div>
+  </div>
+  <div class="arr-h"><svg width="28" height="12"><line x1="0" y1="6" x2="22" y2="6" stroke="#555" stroke-width="1.5"/><polygon points="18,3 26,6 18,9" fill="#555"/></svg></div>
+  <div class="box b-blue">
+    <div class="box-title">Master Data sheet</div>
+    <div class="box-sub">Source of truth. All other sheets pull from here via VLOOKUP / SUMIF formulas.</div>
+    <div class="box-tag">Sheet 1</div>
+  </div>
+  <div style="margin-left:16px;background:#fff3e0;border:1px solid #e65100;border-radius:3px;padding:7px 10px;max-width:200px">
+    <div style="font-size:9px;font-weight:700;color:#e65100;margin-bottom:3px">Rules</div>
+    <div style="font-size:9px;color:#555;line-height:1.5">Each SKU must be unique per colorway · Units per pallet must be confirmed with supplier</div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- PHASE 2 -->
+<div class="section-title">Phase 2 — Purchase Orders (planning)</div>
+<div style="background:#fff3e0;border:1px solid #e65100;border-radius:3px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:#555;line-height:1.7"><strong style="color:#e65100">How to group orders into POs:</strong> Group all line items by supplier + destination into one PO. One PO per supplier per destination. This keeps tracking clean and container planning straightforward.</div>
+<div class="phase-row">
+  <div class="box b-navy">
+    <div class="box-title">Define requirements</div>
+    <div class="box-sub">SKU, destination, quantity per FC (Fulfillment Center / Fulfillment Center)</div>
+    <div class="box-tag">Manual</div>
+  </div>
+  <div class="arr-h"><svg width="28" height="12"><line x1="0" y1="6" x2="22" y2="6" stroke="#555" stroke-width="1.5"/><polygon points="18,3 26,6 18,9" fill="#555"/></svg></div>
+  <div class="box b-green">
+    <div class="box-title">PO Header auto-calculates</div>
+    <div class="box-sub">Total units · Total cost · Pallets · Containers · Utilization % · Flag</div>
+    <div class="box-tag">Auto — Formula</div>
+  </div>
+  <div class="arr-h"><svg width="28" height="12"><line x1="0" y1="6" x2="22" y2="6" stroke="#555" stroke-width="1.5"/><polygon points="18,3 26,6 18,9" fill="#555"/></svg></div>
+  <div class="box b-amber">
+    <div class="box-title">Check utilization</div>
+    <div class="box-sub">Target ≥60% for international shipments · 40ft = 42 pallets · Domestic: no threshold</div>
+    <div class="box-tag">Review</div>
+  </div>
+  <div class="arr-h"><svg width="28" height="12"><line x1="0" y1="6" x2="22" y2="6" stroke="#e65100" stroke-width="1.5" stroke-dasharray="4,2"/><polygon points="18,3 26,6 18,9" fill="#e65100"/></svg></div>
+  <div class="box b-navy">
+    <div class="box-title">Send PO to supplier</div>
+    <div class="box-sub">Status → Released · PO Send Date entered · Inbound Tracker auto-creates tracking rows</div>
+    <div class="box-tag">Manual</div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- PHASE 3 -->
+<div class="section-title">Phase 3 — Inbound Tracker (live tracking)</div>
+<div class="phase-row">
+  <div class="box b-blue">
+    <div class="box-title">Inbound Tracker</div>
+    <div class="box-sub">One row per SKU per PO · Tracks every shipment from order to receipt</div>
+    <div class="box-tag">Sheet 3</div>
+  </div>
+  <div class="arr-h"><svg width="28" height="12"><line x1="0" y1="6" x2="22" y2="6" stroke="#555" stroke-width="1.5"/><polygon points="18,3 26,6 18,9" fill="#555"/></svg></div>
+  <div class="box b-green">
+    <div class="box-title">Order Status auto-updates</div>
+    <div class="box-sub">Driven by formula — updates instantly when data changes</div>
+    <div class="box-tag">Auto — Formula</div>
+  </div>
+  <div class="arr-h"><svg width="28" height="12"><line x1="0" y1="6" x2="22" y2="6" stroke="#555" stroke-width="1.5"/><polygon points="18,3 26,6 18,9" fill="#555"/></svg></div>
+  <div class="box b-green">
+    <div class="box-title">Dates auto-calculate</div>
+    <div class="box-sub">Expected Ship · Expected Delivery · Revised Delivery · Unconfirmed Units · Unreceived Units</div>
+    <div class="box-tag">Auto — Formula</div>
+  </div>
+</div>
+
+<div style="margin:8px 0 4px 0;font-size:9px;font-weight:700;color:#37474f">Order Status progression:</div>
+<div class="status-chain">
+  <div class="status-pill">Pending Internal Approval</div><div class="status-arr">→</div>
+  <div class="status-pill">PO Sent to Supplier</div><div class="status-arr">→</div>
+  <div class="status-pill">Confirmed by Supplier</div><div class="status-arr">→</div>
+  <div class="status-pill">In Transit</div><div class="status-arr">→</div>
+  <div class="status-pill">Received</div><div class="status-arr">→</div>
+  <div class="status-pill closed">Closed</div>
+</div>
+<div style="font-size:9px;color:#666;margin:4px 0 4px 0">Closed = Received Qty = Confirmed Qty AND Rejected Qty ≤ 2% of Received Qty</div>
+
+<div style="background:#fff3e0;border:1px solid #e65100;border-radius:3px;padding:12px 16px;margin:8px 0 6px;font-size:12px;color:#555;line-height:1.7">
+<strong style="color:#e65100;font-size:12px">Important — how updates reach this log:</strong> Updates come from suppliers via email, phone, or shipping system notifications. Every update — no matter how it arrives — must be logged here immediately. Do not wait. Do not edit the Inbound Tracker directly. The code updates the tracker automatically once you fill in the Updates Log row.
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0">
+  <div class="rule-card">
+    <div class="rule-card-title" style="color:#1a3a6e">Enter manually (via Updates Log)</div>
+    <div class="rule-item"><div class="rule-dot"></div>Supplier Confirmation Date</div>
+    <div class="rule-item"><div class="rule-dot"></div>Actual Shipping Date</div>
+    <div class="rule-item"><div class="rule-dot"></div>Transit Delay (weeks)</div>
+    <div class="rule-item"><div class="rule-dot"></div>Actual Delivery Date</div>
+    <div class="rule-item"><div class="rule-dot"></div>Received Qty · Rejected Qty</div>
+    <div class="rule-item"><div class="rule-dot"></div>Shipment Reference</div>
+  </div>
+  <div class="rule-card">
+    <div class="rule-card-title" style="color:#2e7d32">Calculated automatically</div>
+    <div class="rule-item"><div class="rule-dot" style="background:#2e7d32"></div>Order Status</div>
+    <div class="rule-item"><div class="rule-dot" style="background:#2e7d32"></div>Expected Ship Date</div>
+    <div class="rule-item"><div class="rule-dot" style="background:#2e7d32"></div>Expected Delivery Date</div>
+    <div class="rule-item"><div class="rule-dot" style="background:#2e7d32"></div>Revised Delivery Date</div>
+    <div class="rule-item"><div class="rule-dot" style="background:#2e7d32"></div>Unconfirmed Units · Unreceived Units</div>
+    <div class="rule-item"><div class="rule-dot" style="background:#2e7d32"></div>Last Updated timestamp</div>
+  </div>
+</div>
+
+<div style="display:flex;gap:12px;margin:12px 0">
+  <div style="flex:1;background:#e3f2fd;border:1.5px solid #2f75b6;border-radius:3px;padding:12px 16px;">
+    <div style="font-size:13px;font-weight:700;color:#1f5496;margin-bottom:6px">Blue border on a cell</div>
+    <div style="font-size:12px;color:#444;line-height:1.7">A blue border marks a cell that was updated via the Updates Log — it also shows the date and time the update was logged. It does not mean there is a problem. Use it to quickly identify what changed and when.</div>
+  </div>
+  <div style="flex:1;background:#ffebee;border:1.5px solid #c62828;border-radius:3px;padding:12px 16px;">
+    <div style="font-size:13px;font-weight:700;color:#b71c1c;margin-bottom:6px">Red cell highlight</div>
+    <div style="font-size:12px;color:#444;line-height:1.7">A red cell flags a gap or issue that requires attention — a quantity shortfall, a rejection rate above threshold, or stock falling below the reorder point. Red does not update automatically on its own: it is triggered by data entered through the Updates Log or by formula conditions in the Inventory Planning sheet.</div>
+  </div>
+  <div style="flex:1;background:#f5f5f5;border:1.5px solid #546e7a;border-radius:3px;padding:12px 16px;">
+    <div style="font-size:13px;font-weight:700;color:#37474f;margin-bottom:6px">Treatment Status</div>
+    <div style="font-size:12px;color:#444;line-height:1.7">Every update in the Updates Log has a Treatment Status column. <strong>Open</strong> = issue logged but not yet resolved. <strong>Closed</strong> = issue has been followed up and resolved. Keep this column up to date so the team knows what still requires action.</div>
+  </div>
+</div>
+<hr class="divider">
+
+<!-- PHASE 4 -->
+<div class="section-title">Phase 4 — Updates Log (all live updates go here first)</div>
+<div class="phase-row">
+  <div class="box b-navy">
+    <div class="box-title">Receive supplier update</div>
+    <div class="box-sub">Email / phone / system — delay, quantity change, shipment, delivery, rejection</div>
+    <div class="box-tag">Always log here first</div>
+  </div>
+  <div class="arr-h"><svg width="28" height="12"><line x1="0" y1="6" x2="22" y2="6" stroke="#e65100" stroke-width="1.5" stroke-dasharray="4,2"/><polygon points="18,3 26,6 18,9" fill="#e65100"/></svg></div>
+  <div class="box b-navy">
+    <div class="box-title">Fill Updates Log row</div>
+    <div class="box-sub">Channel · Scope · Supplier · PO · SKU · Update Type · value column</div>
+    <div class="box-tag">Manual entry</div>
+  </div>
+  <div class="arr-h"><svg width="28" height="12"><line x1="0" y1="6" x2="22" y2="6" stroke="#555" stroke-width="1.5"/><polygon points="18,3 26,6 18,9" fill="#555"/></svg></div>
+  <div class="box b-green">
+    <div class="box-title">Apps Script runs</div>
+    <div class="box-sub">Inbound Tracker updates instantly · Severity classified · Blue border on changed cell · Timestamp logged</div>
+    <div class="box-tag">Auto — Code</div>
+  </div>
+  <div class="arr-h"><svg width="28" height="12"><line x1="0" y1="6" x2="22" y2="6" stroke="#555" stroke-width="1.5"/><polygon points="18,3 26,6 18,9" fill="#555"/></svg></div>
+  <div class="box b-red">
+    <div class="box-title">Severity auto-classified</div>
+    <div class="box-sub">Critical / Attention / Minor — based on delay weeks, quantity shortfall %, rejection rate</div>
+    <div class="box-tag">Auto</div>
+  </div>
+</div>
+
+<div style="background:#e3f2fd;border:1px solid #1565c0;border-radius:3px;padding:12px 16px;margin:8px 0 6px;font-size:12px;color:#555;line-height:1.7"><strong style="color:#1565c0">Scope — how updates are applied:</strong> SKU Level = update applies to one specific SKU in one PO only (always use for quantity updates). PO Level = update applies to all SKUs in the same PO. Supplier Level = update applies to all SKUs from that supplier across all POs. For delays, you may choose any scope. For quantity changes, always use SKU Level.</div>
+<table class="sev-table" style="margin:10px 0">
+  <thead>
+    <tr><th>Condition</th><th>Severity</th><th>Update Type to use</th><th>Column to fill</th><th>Scope</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Production / transit delay ≥ 2 weeks</td><td><span class="sev-badge sc">Critical</span></td><td>Production Delay / Transit Delay</td><td>Production Delay (weeks) / Transit Delay (weeks)</td><td>SKU / PO / Supplier</td></tr>
+    <tr><td>Production / transit delay = 1 week</td><td><span class="sev-badge sa">Attention</span></td><td>Production Delay / Transit Delay</td><td>Production Delay (weeks) / Transit Delay (weeks)</td><td>SKU / PO / Supplier</td></tr>
+    <tr><td>Quantity shortfall ≥ 20%</td><td><span class="sev-badge sc">Critical</span></td><td>Quantity Confirmed Short</td><td>Confirmed Qty</td><td>SKU Level only</td></tr>
+    <tr><td>Quantity shortfall 10–20%</td><td><span class="sev-badge sa">Attention</span></td><td>Quantity Confirmed Short</td><td>Confirmed Qty</td><td>SKU Level only</td></tr>
+    <tr><td>Quantity shortfall &lt; 10%</td><td><span class="sev-badge sm">Minor</span></td><td>Quantity Received Short</td><td>Received Qty</td><td>SKU Level only</td></tr>
+    <tr><td>Rejected Qty &gt; 2% of Received Qty</td><td><span class="sev-badge sc">Critical</span></td><td>Quantity Rejected</td><td>Rejected Qty</td><td>SKU Level only</td></tr>
+  </tbody>
+</table>
+
+<hr class="divider">
+
+<!-- PHASE 5 -->
+<div class="section-title">Phase 5 — Inventory Planning (automatic)</div>
+<div class="phase-row">
+  <div class="box b-green">
+    <div class="box-title">All fields auto-calculated</div>
+    <div class="box-sub">Pulls from Purchase Orders + Inbound Tracker · One row per SKU per destination</div>
+    <div class="box-tag">Auto — Formula</div>
+  </div>
+  <div class="arr-h"><svg width="28" height="12"><line x1="0" y1="6" x2="22" y2="6" stroke="#555" stroke-width="1.5"/><polygon points="18,3 26,6 18,9" fill="#555"/></svg></div>
+  <div class="box b-blue">
+    <div class="box-title">Key metrics per SKU + destination</div>
+    <div class="box-sub">Current Stock · In Transit · Total Available · Monthly Sales Rate · MOH · Reorder Point · Status</div>
+    <div class="box-tag">Sheet 5</div>
+  </div>
+  <div class="arr-h"><svg width="28" height="12"><line x1="0" y1="6" x2="22" y2="6" stroke="#555" stroke-width="1.5"/><polygon points="18,3 26,6 18,9" fill="#555"/></svg></div>
+  <div class="box b-amber">
+    <div class="box-title">Monitor Reorder Point</div>
+    <div class="box-sub">Place new PO when Total Available approaches Reorder Point. Check Master Data for supplier lead times.</div>
+    <div class="box-tag">Action trigger</div>
+  </div>
+</div>
+
+<div style="display:flex;gap:16px;margin:8px 0">
+  <div style="flex:1;background:#fafafa;border:1.5px solid #2f75b6;border-radius:3px;padding:12px 16px;">
+    <div style="font-size:13px;font-weight:700;color:#243e7a;margin-bottom:6px">Total Available</div>
+    <div style="font-size:11px;color:#555;line-height:1.6">Current Stock + In Transit per destination. Includes in-transit stock regardless of expected delivery date.<br><strong>Note:</strong> For time-sensitive decisions, always cross-reference Expected Delivery Date in the Inbound Tracker.</div>
+  </div>
+  <div style="flex:1;background:#fafafa;border:1.5px solid #2f75b6;border-radius:3px;padding:12px 16px;">
+    <div style="font-size:13px;font-weight:700;color:#243e7a;margin-bottom:6px">MOH — Months of Inventory</div>
+    <div style="font-size:11px;color:#555;line-height:1.6">Total Available ÷ Monthly Sales Rate. Shows how many months of stock remain.<br><strong>Action trigger:</strong> When Total Available reaches or falls below the Reorder Point, the cell turns red — a new PO must be placed immediately, or stock will run out before the next shipment arrives.</div>
+  </div>
+</div>
+
+<div style="background:#f5f5f5;border:1px solid #ddd;border-radius:3px;padding:12px 16px;margin:10px 0;">
+  <div style="font-size:13px;font-weight:700;color:#243e7a;margin-bottom:8px">Reorder Status column — auto-calculated</div>
+  <div style="display:flex;gap:12px">
+    <div style="flex:1;background:#ffebee;border:1px solid #c62828;border-radius:3px;padding:8px 12px;">
+      <div style="font-size:12px;font-weight:700;color:#b71c1c;margin-bottom:3px">Reorder Now</div>
+      <div style="font-size:11px;color:#444;line-height:1.5">Total Available has reached or fallen below the Reorder Point. A new PO must be placed immediately — cell turns red.</div>
+    </div>
+    <div style="flex:1;background:#fff8e1;border:1px solid #e65100;border-radius:3px;padding:8px 12px;">
+      <div style="font-size:12px;font-weight:700;color:#e65100;margin-bottom:3px">Monitor</div>
+      <div style="font-size:11px;color:#444;line-height:1.5">Total Available is within 20% above the Reorder Point. Stock is not yet critical but should be tracked closely.</div>
+    </div>
+    <div style="flex:1;background:#e8f5e9;border:1px solid #2e7d32;border-radius:3px;padding:8px 12px;">
+      <div style="font-size:12px;font-weight:700;color:#1b5e20;margin-bottom:3px">OK</div>
+      <div style="font-size:11px;color:#444;line-height:1.5">Total Available is above the Reorder Point threshold. No action required at this time.</div>
+    </div>
+  </div>
+</div>
+<hr class="divider">
+
+<!-- PHASE 6 -->
+<div class="section-title">Phase 6 — Closing an order → PO History</div>
+<div class="phase-row">
+  <div class="box b-green">
+    <div class="box-title">Order auto-closes</div>
+    <div class="box-sub">Received Qty = Confirmed Qty AND Rejected Qty ≤ 2% of Received Qty</div>
+    <div class="box-tag">Auto — Formula</div>
+  </div>
+  <div class="arr-h"><svg width="28" height="12"><line x1="0" y1="6" x2="22" y2="6" stroke="#555" stroke-width="1.5"/><polygon points="18,3 26,6 18,9" fill="#555"/></svg></div>
+  <div class="box b-green">
+    <div class="box-title">Row hidden in Inbound Tracker</div>
+    <div class="box-sub">Keeps tracker clean — only active orders visible</div>
+    <div class="box-tag">Auto — Code</div>
+  </div>
+  <div class="arr-h"><svg width="28" height="12"><line x1="0" y1="6" x2="22" y2="6" stroke="#555" stroke-width="1.5"/><polygon points="18,3 26,6 18,9" fill="#555"/></svg></div>
+  <div class="box b-teal">
+    <div class="box-title">Copied to PO History</div>
+    <div class="box-sub">PO No · Supplier · SKU · Destination · Qtys · Delivery Date · Shipment Ref · Date Closed</div>
+    <div class="box-tag">Archive — Sheet 6</div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- PHASE 7 -->
+<div class="section-title">Phase 7 — Dashboard (AI-powered, open issues only)</div>
+<div class="phase-row">
+  <div class="box b-blue">
+    <div class="box-title">Full workbook data</div>
+    <div class="box-sub">Quantities · dates · statuses · updates — all sheets</div>
+    <div class="box-tag">Data layer</div>
+  </div>
+  <div class="arr-h"><svg width="28" height="12"><line x1="0" y1="6" x2="22" y2="6" stroke="#555" stroke-width="1.5"/><polygon points="18,3 26,6 18,9" fill="#555"/></svg></div>
+  <div class="box b-green">
+    <div class="box-title">AI interpretation layer</div>
+    <div class="box-sub">Identifies what changed, what it means, and what action is required</div>
+    <div class="box-tag">Auto — AI layer</div>
+  </div>
+  <div class="arr-h"><svg width="28" height="12"><line x1="0" y1="6" x2="22" y2="6" stroke="#555" stroke-width="1.5"/><polygon points="18,3 26,6 18,9" fill="#555"/></svg></div>
+  <div class="box b-red" style="max-width:160px">
+    <div class="box-title">Critical</div>
+    <div class="box-sub">Decision needed today — no time to wait</div>
+  </div>
+  <div class="arr-h"><svg width="18" height="12"><line x1="0" y1="6" x2="12" y2="6" stroke="#555" stroke-width="1"/><polygon points="10,4 16,6 10,8" fill="#555"/></svg></div>
+  <div class="box b-amber" style="max-width:160px">
+    <div class="box-title">Attention</div>
+    <div class="box-sub">Monitor this week — action may be needed</div>
+  </div>
+  <div class="arr-h"><svg width="18" height="12"><line x1="0" y1="6" x2="12" y2="6" stroke="#555" stroke-width="1"/><polygon points="10,4 16,6 10,8" fill="#555"/></svg></div>
+  <div class="box b-grey" style="max-width:160px">
+    <div class="box-title">Data Flags</div>
+    <div class="box-sub">Verify before acting — data integrity issues</div>
+  </div>
+  <div class="arr-h"><svg width="18" height="12"><line x1="0" y1="6" x2="12" y2="6" stroke="#555" stroke-width="1"/><polygon points="10,4 16,6 10,8" fill="#555"/></svg></div>
+  <div class="box b-teal" style="max-width:160px">
+    <div class="box-title">Closed</div>
+    <div class="box-sub">Auto-removed when order closes</div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- QUICK REFERENCE -->
+<div class="section-title">Thresholds &amp; Rules — what triggers an alert</div>
+<div style="display:flex;gap:12px;margin-bottom:16px">
+  <div style="flex:1;background:#ffebee;border:1.5px solid #c62828;border-radius:3px;padding:12px 16px;">
+    <div style="font-size:13px;font-weight:700;color:#b71c1c;margin-bottom:6px">Rejection Rate &gt; 2%</div>
+    <div style="font-size:12px;color:#444;line-height:1.6">If Rejected Qty exceeds 2% of Received Qty, the cell turns red and Severity is classified as Critical. A quality issue requiring immediate follow-up with the supplier.</div>
+  </div>
+  <div style="flex:1;background:#fff8e1;border:1.5px solid #e65100;border-radius:3px;padding:12px 16px;">
+    <div style="font-size:13px;font-weight:700;color:#e65100;margin-bottom:6px">Container Utilization &lt; 60%</div>
+    <div style="font-size:12px;color:#444;line-height:1.6">Applies to international shipments only. Below 60% triggers a "Consider consolidation" flag in the PO Header. Domestic suppliers are not subject to this threshold.</div>
+  </div>
+  <div style="flex:1;background:#ffebee;border:1.5px solid #c62828;border-radius:3px;padding:12px 16px;">
+    <div style="font-size:13px;font-weight:700;color:#b71c1c;margin-bottom:6px">Reorder Status: Reorder Now</div>
+    <div style="font-size:12px;color:#444;line-height:1.6">Triggered when Total Available ≤ Reorder Point. Cell turns red automatically. A new PO must be placed immediately — stock will be depleted before the next shipment arrives.</div>
+  </div>
+</div>
+<div class="section-title">Quick Reference — Where to go for what</div>
+<div style="background:#e3f2fd;border:1px solid #b4c7e7;border-radius:3px;padding:12px 16px;margin-bottom:10px;font-size:12px;color:#1f5496;line-height:1.7">
+<strong>Golden rule:</strong> When in doubt — start with Master Data for supplier info, Updates Log for any change, and the Dashboard for the current status of open issues. Never edit the Inbound Tracker directly.
+</div>
+<div class="rules-grid">
+  <div class="rule-card">
+    <div class="rule-card-title">Placing a new order</div>
+    <div class="rule-item"><div class="rule-dot"></div>Check Master Data for supplier lead times</div>
+    <div class="rule-item"><div class="rule-dot"></div>Enter requirements in Purchase Orders sheet</div>
+    <div class="rule-item"><div class="rule-dot"></div>Review container utilization before sending</div>
+    <div class="rule-item"><div class="rule-dot"></div>Set PO Status to Released when sent</div>
+  </div>
+  <div class="rule-card">
+    <div class="rule-card-title">Receiving a supplier update</div>
+    <div class="rule-item"><div class="rule-dot"></div>Always go to Updates Log first — never edit Inbound Tracker directly</div>
+    <div class="rule-item"><div class="rule-dot"></div>Select correct Update Type from dropdown</div>
+    <div class="rule-item"><div class="rule-dot"></div>Use SKU Level for all quantity updates</div>
+    <div class="rule-item"><div class="rule-dot"></div>Inbound Tracker updates automatically</div>
+  </div>
+  <div class="rule-card">
+    <div class="rule-card-title">Checking stock health</div>
+    <div class="rule-item"><div class="rule-dot"></div>Go to Inventory Planning sheet</div>
+    <div class="rule-item"><div class="rule-dot"></div>Check MOH — below 1.5 months needs attention</div>
+    <div class="rule-item"><div class="rule-dot"></div>Check if Total Available is near Reorder Point</div>
+    <div class="rule-item"><div class="rule-dot"></div>Supplier lead time = 14–15 weeks — plan well ahead</div>
+  </div>
+</div>
+
+</div>
+<div style="margin-top:28px;font-size:9px;color:#aaa;text-align:center">
+  Inbound Operations · Process Flow
+</div>
+
+</div>
+</body>
+</html>
